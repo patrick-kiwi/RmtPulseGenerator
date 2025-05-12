@@ -11,10 +11,10 @@ ESP32-C6  |     2                  |     YES
 
 #### Synchronisation
 
-Behind the scenes the transmit configuration variable .loop_count=-1 sets an infinite loop.  Even with synch manager set up, and with a perfectly matching the number of ticks between channels this approach still results in imperfect synchronisation.  There’s a small phase shift ranging from 50 to 300 ns which is constant with respect to time, but varies from example to example.
+Behind the scenes the transmit configuration variable .loop_count=-1 sets an infinite loop (no cpu overhead).  However, this approach still results in imperfect synchronisation.  Specifically, a small phase shift ranging from 50 to 300 ns which is constant with respect to time, but varies from example to example.  If you need nanosecond perfect synchronisation then you need to lean on the cpu with a single shot approach (.loop_count=0) where transmits and synch manager are contained in the loop part of the code.    
 
 #### Tick Number
 
-The rmt_symbol_word_t has only 15 bits to encode ticks.  By default the .resolution_hz is set to 1MHz meaning each tick corresponds to 1 µs.  That tick-width can be changed if you wish.  
+Each rmt_symbol_word_t has only 15 bits to encode ticks.  By default the .resolution_hz is set to 1MHz, meaning that each tick corresponds to 1 µs.  That tick-width can be changed if you wish.  
 
  
