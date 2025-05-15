@@ -1,4 +1,4 @@
-#include "RmtPulseGenerator.h"
+#include "RmtPulseGenerator_2chan.h"
 
 RmtPulseGenerator::RmtPulseGenerator(gpio_num_t gpioA, gpio_num_t gpioB) {
     tx_gpio_number[0] = gpioA;
