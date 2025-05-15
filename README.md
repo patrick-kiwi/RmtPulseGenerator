@@ -1,22 +1,32 @@
-# Arduino Esp32 RMT Pulse Sequence Synchronisation
-Sends synchronised pulses to GPIO pins with zero processor overhead using the RMT peripheral hardware.  Note that this doesn't work on a standard esp32 board.   
-```
-Board     | Number of RMT Channels | Sync Manager Supported
-ESP32     |     8                  |     NO
-ESP32-S3  |     4                  |     YES
-ESP32-C3  |     2                  |     YES
-ESP32-C6  |     2                  |     YES
-```
-### Limitations
+# Arduino ESP32 RMT Pulse Sequence Synchronisation
 
-#### Synchronisation
+This library allows you to send **synchronised pulse sequences to GPIO pins** on supported ESP32 chips with **zero processor overhead** by leveraging the **RMT (Remote Control) peripheral hardware**.
 
-Behind the scenes the transmit configuration variable .loop_count=-1 sets an infinite loop (no cpu overhead).  However, this approach still results in imperfect synchronisation.  Specifically, a small phase shift ranging from 50 to 300 ns which is constant with respect to time, but varies from example to example.  If you need nanosecond perfect synchronisation then you need to lean on the cpu with a single shot approach (.loop_count=0) where transmits and synch manager are contained in the loop part of the code.   
+> ⚠️ **Not supported on standard ESP32 boards.**
 
-#### Tick Number
+| Board     | RMT Channels | Sync Manager Supported |
+|-----------|--------------|------------------------|
+| ESP32     | 8            | ❌ No                  |
+| ESP32-S3  | 4            | ✅ Yes                 |
+| ESP32-C3  | 2            | ✅ Yes                 |
+| ESP32-C6  | 2            | ✅ Yes                 |
 
-Default tick-width is 1 us set by the .resolution_hz @ 1MHz.  Bare in mind that the rmt_symbol_word_t only has 15 bits to encode ticks.   
+---
 
-#### Callbacks
- 
-RMT callbacks can't be used with this approach because the pulse sequence never finishes to initiate the callback. 
+## Limitations
+
+### Synchronisation
+
+This library uses `.loop_count = -1` for continuous transmission without CPU involvement. However, using this approach, a **fixed phase offset** of **50–300 ns** occurs between channels. This offset is **constant over time**.
+
+If you require **nanosecond-accurate synchronisation**, you must use `.loop_count = 0` (single-shot mode) and coordinate transmission start times **manually in your main loop**, using the sync manager.
+
+### Tick Resolution
+
+The default tick resolution is **1 µs**, set by `.resolution_hz = 1 MHz`.  
+Note: `rmt_symbol_word_t` only allocates **15 bits for tick encoding**, so the **maximum pulse duration is 32,767 ticks (≈32.8 ms at 1 MHz)**.
+
+### Callbacks
+
+RMT callbacks **are not compatible** with this approach.  
+Because the sequence is looped infinitely (`.loop_count = -1`), the RMT never triggers a completion event, so no callbacks are invoked.
