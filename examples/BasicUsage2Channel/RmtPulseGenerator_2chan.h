@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <driver/rmt_tx.h>
 #include <vector>
 #include <utility> // for std::pair
@@ -43,24 +44,10 @@ synchronize_patterns(const rmt_symbol_word_t *patternA, size_t lenA,
 
 class RmtPulseGenerator {
 public:
-    RmtPulseGenerator(gpio_num_t gpioA, gpio_num_t gpioB, gpio_num_t gpioC, gpio_num_t gpioD);
-    
-    // Initial setup - creates channels and starts transmission
-    void begin(const std::vector<rmt_symbol_word_t>& patternA, const std::vector<rmt_symbol_word_t>& patternB,
-               const std::vector<rmt_symbol_word_t>& patternC, const std::vector<rmt_symbol_word_t>& patternD);
-    
-    // Update patterns on the fly - briefly stops output, reconfigures, and restarts synchronized
-    void update(const std::vector<rmt_symbol_word_t>& patternA, const std::vector<rmt_symbol_word_t>& patternB,
-                const std::vector<rmt_symbol_word_t>& patternC, const std::vector<rmt_symbol_word_t>& patternD);
-
+    RmtPulseGenerator(gpio_num_t gpioA, gpio_num_t gpioB);
+    void begin(const std::vector<rmt_symbol_word_t>& patternA, const std::vector<rmt_symbol_word_t>& patternB);
 private:
-    rmt_channel_handle_t tx_channels[4];
-    gpio_num_t tx_gpio_number[4];
+    rmt_channel_handle_t tx_channels[2];
+    gpio_num_t tx_gpio_number[2];
     rmt_encoder_handle_t copyEncoder;
-    rmt_sync_manager_handle_t sync_mgr;
-    bool initialized;
-    
-    // Helper to transmit synchronized patterns (used by both begin and update)
-    void transmitPatterns(const std::vector<rmt_symbol_word_t>& patternA, const std::vector<rmt_symbol_word_t>& patternB,
-                          const std::vector<rmt_symbol_word_t>& patternC, const std::vector<rmt_symbol_word_t>& patternD);
 };

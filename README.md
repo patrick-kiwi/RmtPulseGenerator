@@ -30,3 +30,46 @@ Note: `rmt_symbol_word_t` only allocates **15 bits for tick encoding**, so the *
 
 RMT callbacks **are not compatible** with this approach.  
 Because the sequence is looped infinitely (`.loop_count = -1`), the RMT never triggers a completion event, so no callbacks are invoked.
+
+
+## Dynamic Pattern Updates
+
+The library supports changing pulse patterns on the fly while maintaining synchronization across all four channels.
+
+### How It Works
+
+The `update()` method allows you to change any or all channel patterns at runtime:
+
+```cpp
+rmt.update(newPatternA, patternB, patternC, patternD);
+```
+
+Internally, this briefly stops all channels (~microseconds), reconfigures them with the new patterns, recreates the sync manager, and restarts transmission. All channels remain perfectly synchronized after the update.
+
+### Example Usage
+
+```cpp
+RmtPulseGenerator rmt(GPIO_NUM_10, GPIO_NUM_11, GPIO_NUM_12, GPIO_NUM_13);
+
+// Define patterns
+const std::vector<rmt_symbol_word_t> narrowPulse = {{
+    { .duration0 = 1, .level0 = 1, .duration1 = 9, .level1 = 0 },
+}};
+
+const std::vector<rmt_symbol_word_t> widePulse = {{
+    { .duration0 = 5, .level0 = 1, .duration1 = 9, .level1 = 0 },
+}};
+
+// Start with narrow pulse on channel 0
+rmt.begin(narrowPulse, narrowPulse, narrowPulse, narrowPulse);
+
+// Later, switch channel 0 to wide pulse
+rmt.update(widePulse, narrowPulse, narrowPulse, narrowPulse);
+```
+
+### Notes
+
+- The update causes a brief output gap (microseconds) during reconfiguration
+- Pattern synchronization is automatically recalculated on each update
+- The `begin()` method must be called before `update()`
+
