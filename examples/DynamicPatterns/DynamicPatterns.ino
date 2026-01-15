@@ -4,23 +4,23 @@
 // Create the RMT pulse generator (global so we can access from loop)
 RmtPulseGenerator rmt(GPIO_NUM_10, GPIO_NUM_11, GPIO_NUM_12, GPIO_NUM_13);
 
-// Pattern A: 1µs high, 9µs low (original)
+// Pattern A: 5µs high, 15µs low (longest on-off sequence dictates frequency)
 const std::vector<rmt_symbol_word_t> pulseSequenceA = {{
     { .duration0 = 5, .level0 = 1, .duration1 = 15, .level1 = 0 },
 }};
 
-// Pattern X: 5µs high, 9µs low (alternate for channel A)
+// Pattern X: 1µs high (alternate for channel B)
 const std::vector<rmt_symbol_word_t> pulseSequenceX = {{
-    { .duration0 = 3, .level0 = 1, .duration1 = 17, .level1 = 0 },
+    { .duration0 = 1, .level0 = 1, .duration1 = 1, .level1 = 0 },
 }};
 
 // Patterns B, C, D stay the same
 const std::vector<rmt_symbol_word_t> pulseSequenceB = {{
-    { .duration0 = 4, .level0 = 1, .duration1 = 16, .level1 = 0 },
+    { .duration0 = 12, .level0 = 1, .duration1 = 6, .level1 = 0 },
 }};
 
 const std::vector<rmt_symbol_word_t> pulseSequenceC = {{
-    { .duration0 = 15, .level0 = 0, .duration1 = 5, .level1 = 1 },
+    { .duration0 = 15, .level0 = 0, .duration1 = 4, .level1 = 1 },
 }};
 
 const std::vector<rmt_symbol_word_t> pulseSequenceD = {{
